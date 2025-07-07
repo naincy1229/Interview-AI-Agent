@@ -1,5 +1,5 @@
-streamlit
-ollama
-python-docx
-fpdf
-speechrecognition
+streamlit==1.46.1
+ollama==0.5.1
+python-docx==1.2.0
+fpdf==1.7.2
+speechrecognition==3.14.3
