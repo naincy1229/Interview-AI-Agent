@@ -1,0 +1,7 @@
+streamlit
+ollama
+python-docx
+fpdf
+pyttsx3
+speechrecognition
+pyaudio

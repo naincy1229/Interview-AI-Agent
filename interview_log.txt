@@ -1,0 +1,18 @@
+
+Q: Tell me about yourself.
+A: I'm a CS student interested in AI, with experience in Python and a few GenAI projects.
+📝 Feedback:
+ As a senior technical interviewer, I would evaluate the answer from the job candidate as follows:
+
+Strengths:
+
+* The candidate is clear about their interest in AI and has experience working with Python, which is a commonly used language in the field of AI.
+* The candidate mentions specific projects they have worked on using GenAI, which suggests that they have practical experience in this area.
+
+Weaknesses:
+
+* The answer is quite general and does not provide any specific details about the candidate's skills or experiences.
+* The term "GenAI" is not well-defined, and it would be helpful to have more information about the types of projects the candidate has worked on using this technology.
+
+Follow-up question: Can you tell me more about the projects you worked on using GenAI? What specific skills or knowledge did you gain from these projects, and how do you think they will help you in a career in AI?
+----------------------------------------
