@@ -3,7 +3,7 @@
 import streamlit as st
 import ollama
 import time
-import pyttsx3
+import os
 import speech_recognition as sr
 from datetime import datetime
 from fpdf import FPDF
@@ -11,11 +11,14 @@ from docx import Document
 
 st.set_page_config(page_title="Mock Interview AI", layout="centered")
 
-# Initialize TTS engine
-tts_engine = pyttsx3.init()
-tts_engine.setProperty('rate', 170)
+# Use TTS only when not on Render
+if not os.environ.get("RENDER"):
+    import pyttsx3
+    tts_engine = pyttsx3.init()
+    tts_engine.setProperty('rate', 170)
+else:
+    tts_engine = None
 
-# Predefined question banks
 QUESTION_BANK = {
     "HR": [
         "Tell me about yourself.",
@@ -47,7 +50,6 @@ if 'resume_text' not in st.session_state:
 
 st.title("🧠 AI Mock Interview Coach")
 
-# Upload resume
 resume_file = st.file_uploader("📄 Upload Your Resume (DOCX only)", type=['docx'])
 if resume_file:
     doc = Document(resume_file)
@@ -55,13 +57,11 @@ if resume_file:
     st.session_state.resume_text = resume_text
     st.success("✅ Resume loaded. Interview will be personalized.")
 
-# Question Category
 st.selectbox("📂 Choose Question Category:", options=list(QUESTION_BANK.keys()), key='category', on_change=lambda: (st.session_state.update({'questions': QUESTION_BANK[st.session_state.category], 'q_index': 0, 'logs': []})))
 
 question = st.session_state.questions[st.session_state.q_index]
 st.markdown(f"### 💬 {question}")
 
-# Timer
 with st.expander("⏱️ Timer (3 mins)"):
     if st.button("Start Timer"):
         for sec in range(180, 0, -1):
@@ -69,11 +69,10 @@ with st.expander("⏱️ Timer (3 mins)"):
             time.sleep(1)
             st.experimental_rerun()
 
-# Record Audio
 def record_audio():
     recognizer = sr.Recognizer()
     with sr.Microphone() as source:
-        st.info("🎙 Speak now...")
+        st.info("🎧 Speak now...")
         audio_data = recognizer.listen(source, phrase_time_limit=10)
     try:
         text = recognizer.recognize_google(audio_data)
@@ -85,7 +84,7 @@ def record_audio():
 
 user_answer = st.text_area("🧑 Your Answer:", height=150)
 
-if st.button("🎙 Use Voice Input"):
+if st.button("🎧 Use Voice Input"):
     result = record_audio()
     st.write(f"🗣 You said: {result}")
     user_answer = result
@@ -118,12 +117,10 @@ Provide:
         st.markdown("### 📝 Feedback:")
         st.write(feedback)
 
-        # Voice output
-        if st.button("🔊 Read Feedback Aloud"):
+        if tts_engine and st.button("🔊 Read Feedback Aloud"):
             tts_engine.say(feedback)
             tts_engine.runAndWait()
 
-        # Save log
         log_entry = {
             "question": question,
             "answer": user_answer,
@@ -132,7 +129,6 @@ Provide:
         }
         st.session_state.logs.append(log_entry)
 
-        # Save to file
         filename = f"interview_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
         with open(filename, "a", encoding="utf-8") as f:
             f.write(f"Q: {question}\nA: {user_answer}\n{feedback}\n{'-'*40}\n")
@@ -145,7 +141,6 @@ Provide:
     else:
         st.warning("Please enter or record an answer first.")
 
-# Follow-up Chat
 st.markdown("---")
 st.markdown("### 💬 Ask a follow-up about the feedback")
 followup = st.text_input("Type your follow-up question")
@@ -159,7 +154,6 @@ if st.button("Ask AI"):
             )
             st.write(f_response['message']['content'])
 
-# PDF Export
 if st.button("📄 Download PDF Report"):
     pdf = FPDF()
     pdf.add_page()
